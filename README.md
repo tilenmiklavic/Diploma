@@ -19,3 +19,5 @@ V drugem delu bi vizualiziral količino čivkov o posamezni kriptovaluti ter cen
 Iz ugotovitev 2. dela bi izdelal model, ki bi lahko v živo predvidel ponavljanje zgodovinskega dogajanja na trgu in o tem obvestil uporabnika. Ravno tako bi spremljal novice in čivke “vplivnežev”, kar bi posebej klasificiral kot izreden dogodek. 
 Model bi nato preizkusil na trenutnem obnašanju trga in simuliral njegovo obnašanja in uspešnost napovedovanja. 
 
+## REFERENCE
+[tweets_data](tweets_data)
