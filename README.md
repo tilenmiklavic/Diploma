@@ -20,4 +20,4 @@ Iz ugotovitev 2. dela bi izdelal model, ki bi lahko v živo predvidel ponavljanj
 Model bi nato preizkusil na trenutnem obnašanju trga in simuliral njegovo obnašanja in uspešnost napovedovanja. 
 
 ## REFERENCE
-[tweets_data](tweets_data)
+[**tweets_data**](tweets_data) Vsebuje datoteke s številom čivkov skozi čas
