@@ -31,6 +31,7 @@ def plotGraph(file1, file2):
     """
     dates = []
     tweets = []
+    
 
     with open(PATH_TWEETS + "/" + file1) as json_file:
         data = json.load(json_file)
