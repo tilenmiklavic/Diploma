@@ -20,6 +20,7 @@ def listFiles(dir):
     return jsons
 
 
+
 # function for plotting a graph from JSON data
 def plotGraph(file1, file2): 
     fig, ax1 = plt.subplots()
