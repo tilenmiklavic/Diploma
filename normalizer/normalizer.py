@@ -6,6 +6,7 @@ from os import listdir
 from os.path import isfile, join
 
 PATH = "example_btc_price"
+OUTPUT_PATH = "normalized_prices"
 
 # function for returning the list of data in directory
 def listFiles(dir):
@@ -92,7 +93,7 @@ def normalize(file1):
             except ValueError:
                 print("Not int")
 
-        with open(PATH + "/" + file1 + "_normalized.json", 'w') as outfile:
+        with open(OUTPUT_PATH + "/" + file1 + "_normalized.json", 'w') as outfile:
             json.dump(normalized_data, outfile)
 
 
