@@ -5,8 +5,8 @@ import datetime
 from os import listdir
 from os.path import isfile, join
 
-PATH = "example_btc_price"
-OUTPUT_PATH = "normalized_prices"
+PATH = "price_data/json_files/"
+OUTPUT_PATH = "normalized_prices/"
 
 # function for returning the list of data in directory
 def listFiles(dir):
@@ -21,7 +21,7 @@ def listFiles(dir):
 
 # function for plotting a graph from JSON data
 def normalize(file1):
-    with open(PATH + "/" + file1) as json_file:
+    with open(PATH + file1) as json_file:
         data = json.load(json_file)
         new_data = []
         key = ''
@@ -49,10 +49,16 @@ def normalize(file1):
                     sub_key = input('Answear: ')
 
                 # if we encounter a missing value we fill it with the last known one
-                if p[sub_key] == 'null':
+                print(p[sub_key])
+                # if isinstance(p[sub_key], float) or isinstance(p[sub_key], int) or p[sub_key].isnumeric():
+                #     curr = float(p[sub_key])
+                # else:
+                #     curr = previous
+                try:
+                    if p[sub_key]:
+                        curr = float(p[sub_key])
+                except ValueError:
                     curr = previous
-                else:
-                    curr = float(p[sub_key])
 
                 # determine max value and min value
                 min_value = min(curr, min_value)
@@ -72,10 +78,15 @@ def normalize(file1):
         for p in data[key]:
             try:
                 # if we encounter a missing value we fill it with the last known one
-                if p[sub_key] == 'null':
+                # if isinstance(p[sub_key], float) or isinstance(p[sub_key], int):
+                #     curr = float(p[sub_key])
+                # else:
+                #     curr = previous
+                try:
+                    if p[sub_key]:
+                        curr = float(p[sub_key])
+                except ValueError:
                     curr = previous
-                else:
-                    curr = float(p[sub_key])
 
                 normalized_value = ((curr - min_value) / (max_value - min_value))
                 normalized_list.append(normalized_value)
@@ -87,17 +98,18 @@ def normalize(file1):
             try:
                 normalized_data[key].append({
                     'date': p['date'],
-                    key: value
+                    sub_key: value
                 })
 
             except ValueError:
                 print("Not int")
 
-        with open(OUTPUT_PATH + "/" + file1 + "_normalized.json", 'w') as outfile:
+        with open(OUTPUT_PATH + file1, 'w') as outfile:
             json.dump(normalized_data, outfile)
 
 
 if __name__ == '__main__':
     tweetsFiles = listFiles(PATH)
 
-    normalize(tweetsFiles[0])
+    for file in tweetsFiles:
+        normalize(file)

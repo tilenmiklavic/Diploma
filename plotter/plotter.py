@@ -5,8 +5,8 @@ import datetime
 from os import listdir
 from os.path import isfile, join 
 
-PATH_TWEETS = "example_btc_tweets"
-PATH_PRICE = "example_btc_price" 
+PATH_TWEETS = "normalized_tweets/"
+PATH_PRICE = "normalized_prices/"
 
 
 # function for returning the list of data in directory
@@ -33,15 +33,15 @@ def plotGraph(file1, file2):
     tweets = []
     
 
-    with open(PATH_TWEETS + "/" + file1) as json_file:
+    with open(PATH_TWEETS + file1) as json_file:
         data = json.load(json_file)
         for p in data["tweets"]:
             try:
-                a = int(p["tweet"])
+                a = float(p["tweet"])
                 tweets.append(a)
                 dates.append(np.datetime64(p["date"]))
             except ValueError:
-                print("Not int")
+                print("Not int", p["tweet"])
 
 
     """
@@ -50,13 +50,13 @@ def plotGraph(file1, file2):
     price_dates = []
     prices = []
 
-    with open(PATH_PRICE + "/" + file2) as json_file:
+    with open(PATH_PRICE + file2) as json_file:
         data = json.load(json_file)
         for p in data["prices"]:
             try:
-                a = float(p["close"])
+                a = float(p["price"])
                 prices.append(a)
-                price_dates.append(np.datetime64(datetime.datetime.strptime(p["date"], '%d-%m-%Y')))
+                price_dates.append(np.datetime64(p["date"]))
             except ValueError:
                 print("Erorr with prices")
 
@@ -74,13 +74,21 @@ def plotGraph(file1, file2):
     ax1.set_ylabel('Tweets', color='green')
     ax2.set_ylabel('Price', color='blue')
 
-    fig.tight_layout()
-    plt.show()
+    leg = plt.legend()
+    for line in leg.get_lines():
+        line.set_linewidth(1)
+
+    # fig.tight_layout()
+    # plt.show()
+    plt.savefig(file1 + '_' + file2 + '.png', dpi=600)
     print("Plotting complete")
 
 if __name__ == '__main__':
-    tweetsFiles = listFiles(PATH_TWEETS)
-    priceFiles = listFiles(PATH_PRICE)
+    tweetsFiles = sorted(listFiles(PATH_TWEETS))
+    priceFiles = sorted(listFiles(PATH_PRICE))
+
+    print(tweetsFiles)
+    print(priceFiles)
     
     for file1, file2 in zip(tweetsFiles, priceFiles):
         plotGraph(file1, file2)
