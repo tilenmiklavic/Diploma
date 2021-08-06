@@ -1,0 +1,48 @@
+{
+	"coins": [
+		{
+			"name": "cardano",
+			"symbol": "ada"
+		},
+		{
+			"name": "bitcoin cash",
+			"symbol": "bch"
+		},
+		{
+			"name": "binance coin",
+			"symbol": "bnb"
+		},
+		{
+			"name": "bittorrent",
+			"symbol": "btt"
+		},
+		{
+			"name": "dogecoin",
+			"symbol": "doge"
+		},
+		{
+			"name": "eos",
+			"symbol": "eos"
+		},
+		{
+			"name": "ethereum",
+			"symbol": "eth"
+		},
+		{
+			"name": "litecoin",
+			"symbol": "ltc"
+		},
+		{
+			"name": "tron",
+			"symbol": "trx"
+		},
+		{
+			"name": "ripple",
+			"symbol": "xrp"
+		},
+		{
+			"name": "bitcoin",
+			"symbol": "btc"
+		}
+	]
+}
