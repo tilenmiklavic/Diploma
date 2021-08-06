@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from os import listdir
 from os.path import isfile, join
+from datetime import datetime
 import json
 
 PATH_COINS = 'coins.json'
@@ -31,7 +32,8 @@ def writeResults(data, file1):
 
 # function for web scraping
 def scrape(coins):
-    tweets_current = { 'tweets': []}
+    date = datetime.today().strftime('%Y-%m-%d')
+    tweets_current = { 'tweets': [], 'date': date}
     results = []
     browser = webdriver.Chrome()
 
