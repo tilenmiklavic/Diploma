@@ -5,8 +5,11 @@ import datetime
 from os import listdir
 from os.path import isfile, join
 
-PATH = "price_data/json_files/"
-OUTPUT_PATH = "normalized_prices/"
+PATH = "tweets_data/json_files/"
+OUTPUT_PATH = "normalized_tweets/"
+ABOUT_PATH = "about/coin_data.json"
+
+about_data = { "coins": [] }
 
 # function for returning the list of data in directory
 def listFiles(dir):
@@ -28,6 +31,7 @@ def normalize(file1):
         sub_key = ''
         max_value = float('-inf')
         min_value = float('inf')
+        sum_values = 0
         previous = None
         normalized_list = []
         normalized_data = {}
@@ -68,6 +72,8 @@ def normalize(file1):
 
                 previous = curr
 
+                sum_values += curr
+
             except ValueError:
                 print("Not int")
 
@@ -107,9 +113,18 @@ def normalize(file1):
         with open(OUTPUT_PATH + file1, 'w') as outfile:
             json.dump(normalized_data, outfile)
 
+        avg_value = sum_values / len(normalized_list)
+        about_data["coins"].append({"coin": file1,
+                                    "max_value": max_value,
+                                    "min_value": min_value,
+                                    "avg_value": avg_value})
+
 
 if __name__ == '__main__':
     tweetsFiles = listFiles(PATH)
 
     for file in tweetsFiles:
         normalize(file)
+
+    with open(ABOUT_PATH, 'w') as outfile:
+        json.dump(about_data, outfile)
