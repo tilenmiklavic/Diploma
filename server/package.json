@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+<<<<<<< HEAD:website/package.json
     "@angular/animations": "~11.2.10",
     "@angular/common": "~11.2.10",
     "@angular/compiler": "~11.2.10",
@@ -41,5 +42,12 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.1.5"
+=======
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "handlebars": "^4.7.7",
+    "nodemon": "^2.0.12"
+>>>>>>> 67c7278d1b679927ac579a087dd659ccc8fa5965:server/package.json
   }
 }
