@@ -1,4 +1,4 @@
-<table class="table">
+<table class="table table-xxl">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -11,12 +11,12 @@
   </thead>
   <tbody>
     <tr *ngFor='let coin of coins; let i = index'>
-      <th scope="row">{{i + 1}}</th>
-      <td>{{coin.coin}} <strong>{{coin.symbol | uppercase}}</strong></td>
-      <td>{{coin.today}}</td>
-      <td>{{coin.min_value | number: '1.0-0'}}</td>
-      <td>{{coin.max_value | number: '1.0-0'}}</td>
-      <td>{{coin.avg_value | number: '1.0-0'}}</td>
+      <th class='align-middle' scope="row">{{i + 1}}</th>
+      <td class='align-middle'><img class='icon' src="../../../assets/images/{{coin.symbol}}.png" alt="icon"> {{coin.coin}} <strong>{{coin.symbol | uppercase}}</strong></td>
+      <td class='align-middle'>{{coin.today}}</td>
+      <td class='align-middle'>{{coin.min_value | number: '1.0-0'}}</td>
+      <td class='align-middle'>{{coin.max_value | number: '1.0-0'}}</td>
+      <td class='align-middle'>{{coin.avg_value | number: '1.0-0'}}</td>
     </tr>
   </tbody>
 </table>
