@@ -10,6 +10,7 @@ export class CoinsService {
   constructor(private http: HttpClient) { }
   private url = environment.coins_url
 
+  // function for getting coins data
   public getCoinsData(): Promise<any> {
 
 
@@ -19,6 +20,16 @@ export class CoinsService {
       .then(data => data as any)
       .catch(CoinsService.obdelajNapako)
 
+  }
+
+  // function for refreshing coins data
+  public refreshCoinsData(): Promise<boolean> {
+
+    return this.http
+      .post(this.url, {"time": Date.now()})
+      .toPromise()
+      .then(odgovor => odgovor as any)
+      .catch(CoinsService.obdelajNapako)
   }
 
   private static obdelajNapako(napaka: any): Promise<any> {

@@ -5,8 +5,8 @@ import datetime
 from os import listdir
 from os.path import isfile, join 
 
-PATH_TWEETS = "normalized_tweets/"
-PATH_PRICE = "normalized_prices/"
+PATH_TWEETS = "tweets_data/json_files/"
+PATH_PRICE = "price_data/JSONs/"
 
 
 # function for returning the list of data in directory
