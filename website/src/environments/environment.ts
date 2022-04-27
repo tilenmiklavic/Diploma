@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  coins_url: 'http://tilen-diploma.hopto.org/'
+  coins_url: "http://localhost:3000/",
+  cmc_url: "https://sandbox-api.coinmarketcap.com/"
 };
 
 /*
