@@ -8,11 +8,10 @@ import json
 PATH_COINS = 'coins.json'
 OUTPUT_PATH = 'results.json'
 
-
 # function for returning a list of all coins
 def listFiles(file1):
     coins = []
-
+    
     # open json file containing list of all crypto coins
     with open(file1) as json_file:
         data = json.load(json_file)
@@ -48,16 +47,13 @@ def scrape(coins):
         tweets = element.text
         print(tweets)
 
-        results.append({ "name": name, "tweet": tweets })
+        results.append({ "name": name, "symbol": symbol, "tweet": tweets })
 
     browser.close()
     tweets_current['tweets'] = results
     return tweets_current
 
-
-# main function
 if __name__ == '__main__':
-
     coins = listFiles(PATH_COINS)
     tweets = scrape(coins)
     writeResults(tweets, "")

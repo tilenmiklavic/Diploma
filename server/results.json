@@ -1,49 +1,60 @@
 {
-  "tweets": [
-    {
-      "name": "cardano",
-      "tweet": "6,845"
-    },
-    {
-      "name": "bitcoin cash",
-      "tweet": "331"
-    },
-    {
-      "name": "binance coin",
-      "tweet": "128"
-    },
-    {
-      "name": "bittorrent",
-      "tweet": "1,794"
-    },
-    {
-      "name": "dogecoin",
-      "tweet": "24,870"
-    },
-    {
-      "name": "eos",
-      "tweet": "504"
-    },
-    {
-      "name": "ethereum",
-      "tweet": "59,950"
-    },
-    {
-      "name": "litecoin",
-      "tweet": "588"
-    },
-    {
-      "name": "tron",
-      "tweet": "5,079"
-    },
-    {
-      "name": "ripple",
-      "tweet": "10,830"
-    },
-    {
-      "name": "bitcoin",
-      "tweet": "95,549"
-    }
-  ],
-  "date": "2021-08-06"
+    "tweets": [
+        {
+            "name": "cardano",
+            "symbol": "ada",
+            "tweet": "14,275"
+        },
+        {
+            "name": "bitcoin cash",
+            "symbol": "bch",
+            "tweet": "412"
+        },
+        {
+            "name": "binance coin",
+            "symbol": "bnb",
+            "tweet": "46"
+        },
+        {
+            "name": "bittorrent",
+            "symbol": "btt",
+            "tweet": "2,858"
+        },
+        {
+            "name": "dogecoin",
+            "symbol": "doge",
+            "tweet": "24,917"
+        },
+        {
+            "name": "eos",
+            "symbol": "eos",
+            "tweet": "2,077"
+        },
+        {
+            "name": "ethereum",
+            "symbol": "eth",
+            "tweet": "48,479"
+        },
+        {
+            "name": "litecoin",
+            "symbol": "ltc",
+            "tweet": "1,212"
+        },
+        {
+            "name": "tron",
+            "symbol": "trx",
+            "tweet": "5,742"
+        },
+        {
+            "name": "ripple",
+            "symbol": "xrp",
+            "tweet": "59,867"
+        },
+        {
+            "name": "bitcoin",
+            "symbol": "btc",
+            "tweet": "166,556"
+        }
+    ],
+    "date": "2022-04-20"
 }
