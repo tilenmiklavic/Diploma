@@ -11,15 +11,21 @@ export class CoinsService {
   private url = environment.coins_url
 
   // function for getting coins data
-  public getCoinsData(): Promise<any> {
-
-
+  public get(): Promise<any> {
     return this.http
-      .get(this.url)
+      .get(this.url + "get")
       .toPromise()
       .then(data => data as any)
       .catch(CoinsService.obdelajNapako)
+  }
 
+  // function for scraping new data
+  public scrapeData(): Promise<any> {
+    return this.http
+      .get(this.url + "scrape")
+      .toPromise()
+      .then(data => data as any)
+      .catch(CoinsService.obdelajNapako)
   }
 
   // function for refreshing coins data

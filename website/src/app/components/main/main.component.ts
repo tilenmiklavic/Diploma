@@ -13,15 +13,17 @@ export class MainComponent implements OnInit {
   ) { }
 
   // actual coins data used in html
-  public coins = []
+  public coins = [];
 
   // function for calling service for coins data
   private populateTable(): void {
-    this.coinService.getCoinsData()
+    this.coinService.get()
       .then(odgovor => {
-        console.log(odgovor)
+        for (const [key, value] of Object.entries(odgovor.data)) {
+          this.coins.push(value[0])
+        }
 
-        this.coins = odgovor.coins
+        console.log(this.coins)
       })
       .catch(napaka => {
         console.error("Napaka:", napaka)

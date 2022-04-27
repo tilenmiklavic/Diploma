@@ -12,11 +12,11 @@
   <tbody>
     <tr *ngFor='let coin of coins; let i = index'>
       <th class='align-middle' scope="row">{{i + 1}}</th>
-      <td class='align-middle'><img class='icon' src="../../../assets/images/{{coin.symbol}}.png" alt="icon"> {{coin.coin}} <strong>{{coin.symbol | uppercase}}</strong></td>
-      <td class='align-middle'>{{coin.today}}</td>
-      <td class='align-middle'>{{coin.min_value | number: '1.0-0'}}</td>
-      <td class='align-middle'>{{coin.max_value | number: '1.0-0'}}</td>
-      <td class='align-middle'>{{coin.avg_value | number: '1.0-0'}}</td>
+      <td class='align-middle'><img class='icon' src="../../../assets/images/{{coin.symbol | lowercase}}.png" alt="icon"> {{ coin.coin }} <strong>{{ coin.symbol | uppercase }}</strong></td>
+      <td class='align-middle'>{{ coin.quote.USD.price | number : '1.2-2' }} $</td>
+      <td class='align-middle'>{{ coin.min_value | number: '1.0-0' }}</td>
+      <td class='align-middle'>{{ coin.max_value | number: '1.0-0' }}</td>
+      <td class='align-middle'>{{ coin.avg_value | number: '1.0-0' }}</td>
     </tr>
   </tbody>
 </table>
