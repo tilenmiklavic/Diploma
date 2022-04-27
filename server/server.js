@@ -1,56 +1,76 @@
-const { readFileSync, writeFileSync, fstat } = require('fs');
-
 const express = require('express');
+const config =  require('./config.js');
+const fs = require('fs');
 const cors = require('cors')
-const path = require('path')
-const url = require('url')
-const fs = require('fs')
 const app = express();
-const port = process.env.PORT || 5000
-const router = express.Router()
+const PythonShell = require('python-shell').PythonShell;
+const port = process.env.PORT || 3000
+const axios = require('axios');
 
 app.use(cors())
 
+// ============ ROUTES ======================
 app.get('/', index)
-app.get('/login', login)
+app.get('/get', getCoinsData)
+app.get('/scrape', scrape)
+// ==========================================
 
 function index(req, res) {
     console.log("Index")
     res.send({"greeting": "Hello world-"})
 } 
 
-function login(req, res) {
-    console.log("Login")
+var readCoinsData = new Promise((resolve, reject) => {
+    fs.readFile('results.json', (err, data) => {
+        if (err) throw err;
+        let student = JSON.parse(data);
+        resolve(student)
+    }); 
+})
+
+// API call for crypto prices
+function readCoinsPrice(symbols) {
+    return new Promise((resolve, reject) => {
+        axios.get('https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest', {
+            headers: {
+                'X-CMC_PRO_API_KEY': 'd1d493de-64d8-4aa1-8373-0e7155b638a1',
+            },
+            params: {
+                'symbol': symbols.toString()
+            }
+        })
+        .then(response => {
+            resolve(response)
+        })
+        .catch(error => {
+            console.error(error.message);
+        });
+    })
 }
 
-// app.get('/', (req, res) => {
-//     console.log("Coins data")
-//     fs.readFile('coin_data.json', function(err, data) {
-//         fs.readFile('results.json', function(err, results) {
-//             let coin_data = JSON.parse(data)
-//             let results_data = JSON.parse(results)
+function getCoinsData(req, res) {
+    readCoinsData
+        .then((result, reject) => {
+            readCoinsPrice(result.tweets.map(x => x.symbol))
+                .then(coinsPrices => {
+                    res.send(coinsPrices.data)
+                })
+        })
+        .catch((error) => {
+            console.error(error)
+            res.send(false)
+        })
+}
 
-//             results_data.tweets.forEach(function(el1, ind1) {
-//                 coin_data.coins.forEach(function(el2, ind2) {
-//                     str1 = el1.name.toLowerCase().replace(/\s/g, '')
-//                     str2 = el2.coin.toLowerCase().replace(/\s/g, '')
+function scrape(req, res) {
+    console.log("Scraping")
 
-//                     if (str1 == str2) {
-//                         coin_data.coins[ind2].today = el1.tweet
-//                     }
-//                 })
-//             })
-//             res.send(coin_data)
-//         })
-//     })
-// });
+    PythonShell.run('../scraper/scraper.py', null, function (err, results) {
+        if (err) throw err;   
+        res.send(readCoinsData)
+    });
+}
 
-// app.get('/coins', (req, res) => {
-//     console.log("Index")
-
-//     res.send("Hello world")
-// })
-
-app.listen(port);
-console.log('Server is up and running on port:', port)
-console.log('http://localhost:' + port)
+app.listen(config.PORT, config.HOST, () => {
+    console.log(`APP LISTENING ON http://${config.HOST}:${config.PORT}`);
+})

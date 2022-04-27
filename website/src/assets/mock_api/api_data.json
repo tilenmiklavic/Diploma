@@ -1,0 +1,10 @@
+[
+  {
+    "symbol": "btc",
+    "coin": "Bitcoin",
+    "today": 39876,
+    "min_value": 21098,
+    "max_value": 47567,
+    "avg_value": 40988
+  }
+]
