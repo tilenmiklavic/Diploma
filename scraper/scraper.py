@@ -7,6 +7,7 @@ import json
 
 PATH_COINS = 'coins.json'
 OUTPUT_PATH = 'results.json'
+APPEND_PATH = '../tweets_data/json_files/'
 
 # function for returning a list of all coins
 def listFiles(file1):
@@ -29,6 +30,23 @@ def writeResults(data, file1):
         json.dump(data, outfile)
 
 
+def appendScrapedData(data, file):
+    f = open(APPEND_PATH + file)
+    old_json = json.load(f)
+
+    first_scrape_of_day = True
+    for element in old_json["tweets"]:
+        if element["date"] == data["date"]:
+            first_scrape_of_day = False
+
+    if first_scrape_of_day:
+        old_json["tweets"].append(data)
+
+    with open(APPEND_PATH + file, 'w') as outfile:
+        json.dump(old_json, outfile)
+
+
+
 # function for web scraping
 def scrape(coins):
     date = datetime.today().strftime('%Y/%m/%d')
@@ -48,8 +66,10 @@ def scrape(coins):
         element = browser.find_element_by_xpath('//tr[td[a[contains(text(), "Tweets per day")]]]/td[2]/a')
         tweets = element.text
         print(tweets)
-
         results.append({"date": date, "name": name, "symbol": symbol, "tweet": tweets })
+
+
+        appendScrapedData({"date": date, "tweet": tweets}, "tweets-"+symbol+".json")
 
     browser.close()
     tweets_current['tweets'] = results
