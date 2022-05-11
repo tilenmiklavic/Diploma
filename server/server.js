@@ -17,29 +17,44 @@ app.get('/scrape', scrape)
 
 function index(req, res) {
     console.log("Index")
-    res.send({"greeting": "Hello world-"})
+    res.send({"greeting": "Hello world"})
 } 
 
-var readCoinsData = new Promise((resolve, reject) => {
-    fs.readFile('results.json', (err, data) => {
-        if (err) throw err;
-        let student = JSON.parse(data);
-        resolve(student)
-    }); 
-})
+// reading results.json
+function readTweetsData() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('../scraper/results.json', (err, data) => {
+            if (err) throw err;
+            let student = JSON.parse(data);
+            resolve(student)
+        }); 
+    });
+}
+
+// reading coins.json
+// function readCoinsData() {
+//     return new Promise((resolve, reject) => {
+//         fs.readFile('coins.json', (err, data) => {
+//             if (err) throw err;
+//             let coins = JSON.parse(data);
+//             resolve(coins)
+//         }); 
+//     });
+// }
 
 // API call for crypto prices
 function readCoinsPrice(symbols) {
     return new Promise((resolve, reject) => {
-        axios.get('https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest', {
+        axios.get(process.env.CMC_URL + 'v2/cryptocurrency/quotes/latest', {
             headers: {
-                'X-CMC_PRO_API_KEY': 'd1d493de-64d8-4aa1-8373-0e7155b638a1',
+                'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY,
             },
             params: {
                 'symbol': symbols.toString()
             }
         })
         .then(response => {
+            console.log(response)
             resolve(response)
         })
         .catch(error => {
@@ -49,8 +64,9 @@ function readCoinsPrice(symbols) {
 }
 
 function getCoinsData(req, res) {
-    readCoinsData
+    readTweetsData()
         .then((result, reject) => {
+            console.log(result)
             readCoinsPrice(result.tweets.map(x => x.symbol))
                 .then(coinsPrices => {
                     res.send(coinsPrices.data)
@@ -67,7 +83,7 @@ function scrape(req, res) {
 
     PythonShell.run('../scraper/scraper.py', null, function (err, results) {
         if (err) throw err;   
-        res.send(readCoinsData)
+        res.send(readTweetsData())
     });
 }
 

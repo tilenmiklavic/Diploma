@@ -31,7 +31,7 @@ def writeResults(data, file1):
 
 # function for web scraping
 def scrape(coins):
-    date = datetime.today().strftime('%Y-%m-%d')
+    date = datetime.today().strftime('%Y/%m/%d')
     tweets_current = { 'tweets': [], 'date': date}
     results = []
     browser = webdriver.Chrome()
@@ -40,6 +40,8 @@ def scrape(coins):
         name = coin['name']
         symbol = coin['symbol']
 
+        print(name)
+
         url = 'https://bitinfocharts.com/' + name + '/'
         browser.get(url)
 
@@ -47,7 +49,7 @@ def scrape(coins):
         tweets = element.text
         print(tweets)
 
-        results.append({ "name": name, "symbol": symbol, "tweet": tweets })
+        results.append({"date": date, "name": name, "symbol": symbol, "tweet": tweets })
 
     browser.close()
     tweets_current['tweets'] = results
