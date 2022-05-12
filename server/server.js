@@ -6,6 +6,7 @@ const app = express();
 const PythonShell = require('python-shell').PythonShell;
 const port = process.env.PORT || 3000
 const axios = require('axios');
+const moment = require('moment')
 
 app.use(cors())
 
@@ -13,10 +14,10 @@ app.use(cors())
 app.get('/', index)
 app.get('/get', getCoinsData)
 app.get('/scrape', scrape)
+app.get('/append', append)
 // ==========================================
 
 function index(req, res) {
-    console.log("Index")
     res.send({"greeting": "Hello world"})
 } 
 
@@ -31,17 +32,6 @@ function readTweetsData() {
     });
 }
 
-// reading coins.json
-// function readCoinsData() {
-//     return new Promise((resolve, reject) => {
-//         fs.readFile('coins.json', (err, data) => {
-//             if (err) throw err;
-//             let coins = JSON.parse(data);
-//             resolve(coins)
-//         }); 
-//     });
-// }
-
 // API call for crypto prices
 function readCoinsPrice(symbols) {
     return new Promise((resolve, reject) => {
@@ -54,7 +44,6 @@ function readCoinsPrice(symbols) {
             }
         })
         .then(response => {
-            console.log(response)
             resolve(response)
         })
         .catch(error => {
@@ -66,7 +55,6 @@ function readCoinsPrice(symbols) {
 function getCoinsData(req, res) {
     readTweetsData()
         .then((result, reject) => {
-            console.log(result)
             readCoinsPrice(result.tweets.map(x => x.symbol))
                 .then(coinsPrices => {
                     res.send(coinsPrices.data)
@@ -85,6 +73,65 @@ function scrape(req, res) {
         if (err) throw err;   
         res.send(readTweetsData())
     });
+}
+
+function appendCoinPrices(prices) {
+    let coins = prices.data
+    for (const coin in coins) {
+
+        let coin_data = coins[coin][0]
+        let data_to_append = {
+            "Currency": coin,
+            "date": moment().format("YYYY/MM/DD"),
+            "price": coin_data.quote.USD.price
+        }
+
+        let prices = fs.readFileSync(`../price_data/json_files/price-${coin.toLowerCase()}.json`, {encoding:'utf8', flag:'r'})
+
+        prices = JSON.parse(prices);
+
+        // only write to file if this is the first run today 
+        let first_run_today = true;
+        for (let price of prices.prices) {
+            if (price.date === moment().format("YYYY/MM/DD")) {
+                first_run_today = false;
+                break;
+            }
+        }
+
+        if (first_run_today) {
+            prices.prices.push(data_to_append)
+    
+            fs.writeFile(`../price_data/json_files/price-${coin.toLowerCase()}.json`, JSON.stringify(prices), (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("JSON data is saved.");
+            });
+        } else {
+            console.log("This was not the first run of the day!")
+        }
+    }
+
+    return(true)
+}
+
+function append(req, res) {
+    readTweetsData()
+        .then((result, reject) => {
+            readCoinsPrice(result.tweets.map(x => x.symbol))
+                .then(coinsPrices => {
+                    res.send(appendCoinPrices(coinsPrices.data))
+                })
+        })
+        .catch((error) => {
+            console.error(error)
+            res.send(false)
+        })
+}
+
+function todayDate() {
+
 }
 
 app.listen(config.PORT, config.HOST, () => {
