@@ -19,6 +19,15 @@ export class CoinsService {
       .catch(CoinsService.obdelajNapako)
   }
 
+  // function for getting coins tweets
+  public getTweets(): Promise<any> {
+    return this.http
+      .get(this.url + "getTweets")
+      .toPromise()
+      .then(data => data as any)
+      .catch(CoinsService.obdelajNapako)
+  }
+
   // function for scraping new data
   public scrapeData(): Promise<any> {
     return this.http

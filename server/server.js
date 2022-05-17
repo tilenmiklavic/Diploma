@@ -13,13 +13,17 @@ app.use(cors())
 // ============ ROUTES ======================
 app.get('/', index)
 app.get('/get', getCoinsData)
+app.get('/getTweets', getTweetsData)
 app.get('/scrape', scrape)
 app.get('/append', append)
+app.get('/normalize', normalize)
 // ==========================================
 
 function index(req, res) {
     res.send({"greeting": "Hello world"})
 } 
+
+// ============ FILE HANDLING ============ // 
 
 // reading results.json
 function readTweetsData() {
@@ -32,49 +36,7 @@ function readTweetsData() {
     });
 }
 
-// API call for crypto prices
-function readCoinsPrice(symbols) {
-    return new Promise((resolve, reject) => {
-        axios.get(process.env.CMC_URL + 'v2/cryptocurrency/quotes/latest', {
-            headers: {
-                'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY,
-            },
-            params: {
-                'symbol': symbols.toString()
-            }
-        })
-        .then(response => {
-            resolve(response)
-        })
-        .catch(error => {
-            console.error(error.message);
-        });
-    })
-}
-
-function getCoinsData(req, res) {
-    readTweetsData()
-        .then((result, reject) => {
-            readCoinsPrice(result.tweets.map(x => x.symbol))
-                .then(coinsPrices => {
-                    res.send(coinsPrices.data)
-                })
-        })
-        .catch((error) => {
-            console.error(error)
-            res.send(false)
-        })
-}
-
-function scrape(req, res) {
-    console.log("Scraping")
-
-    PythonShell.run('../scraper/scraper.py', null, function (err, results) {
-        if (err) throw err;   
-        res.send(readTweetsData())
-    });
-}
-
+// adds todays coin prices to the file 
 function appendCoinPrices(prices) {
     let coins = prices.data
     for (const coin in coins) {
@@ -116,12 +78,105 @@ function appendCoinPrices(prices) {
     return(true)
 }
 
-function append(req, res) {
+// ============ END FILE HANDLING ============ // 
+
+// ============ API COMMUNICATION ============ // 
+
+// API call for crypto prices
+function readCoinsPrice(symbols) {
+    return new Promise((resolve, reject) => {
+        axios.get(process.env.CMC_URL + 'v2/cryptocurrency/quotes/latest', {
+            headers: {
+                'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY,
+            },
+            params: {
+                'symbol': symbols.toString()
+            }
+        })
+        .then(response => {
+            resolve(response)
+        })
+        .catch(error => {
+            console.error(error.message);
+        });
+    })
+}
+
+// scrape internet for number of tweets today
+function scrape() {
+    return new Promise((resolve, reject) => {
+        console.log("Scraping")
+    
+        PythonShell.run('../scraper/scraper.py', null, function (err, results) {
+            if (err) reject();   
+            resolve(true)
+        });
+    })
+}
+
+// normalizes data from prices and tweets
+function normalize(req, res) {
+    return new Promise((resolve, reject) => {
+        console.log("Normalizing")
+    
+        PythonShell.run('../normalizer/normalizer.py', null, function (err, results) {
+            if (err) reject();   
+            resolve(true)
+        });
+    })
+}
+
+// ============ END API COMMUNICATION ============ // 
+
+// ============ HTTP ENDPOINTS ============ // 
+
+// get all info about coins 
+// that includes prices and tweets
+function getCoinsData(req, res) {
     readTweetsData()
         .then((result, reject) => {
             readCoinsPrice(result.tweets.map(x => x.symbol))
                 .then(coinsPrices => {
-                    res.send(appendCoinPrices(coinsPrices.data))
+                    res.send(coinsPrices.data)
+                })
+        })
+        .catch((error) => {
+            console.error(error)
+            res.send(false)
+        })
+        .finally(() => {
+            append();
+        })
+}
+
+function getTweetsData(req, res) {
+    readTweetsData()
+        .then(odgovor => {
+
+            console.log(odgovor)
+            console.log(todayDate())
+
+            if (odgovor.date === todayDate()) {
+                res.send(odgovor)
+            } else {
+                scrape()
+                    .then(odgovor => {
+                        readTweetsData()
+                            .then(data => {
+                                res.send(data)
+                            })
+                    })
+            }
+        })
+}
+
+// function for appending data
+function append() {
+    readTweetsData()
+        .then((result, reject) => {
+            readCoinsPrice(result.tweets.map(x => x.symbol))
+                .then(coinsPrices => {
+                    return(appendCoinPrices(coinsPrices.data))
                 })
         })
         .catch((error) => {
@@ -130,9 +185,20 @@ function append(req, res) {
         })
 }
 
-function todayDate() {
+// ============ END HTTP ENDPOINTS ============ // 
 
+// ============ UTILITIED ============ // 
+
+function todayDate() {
+    let date = new Date();
+    let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+    let month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+    let rezultatDate = `${date.getFullYear()}/${month}/${day}`
+
+    return rezultatDate
 }
+// ============ END UTILITIES ============ // 
+
 
 app.listen(config.PORT, config.HOST, () => {
     console.log(`APP LISTENING ON http://${config.HOST}:${config.PORT}`);

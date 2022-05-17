@@ -4,9 +4,12 @@
       <th scope="col">#</th>
       <th scope="col">Name</th>
       <th scope="col">Today</th>
-      <th scope="col">24h %</th>
-      <th scope="col">7d %</th>
-      <th scope="col">30d %</th>
+      <th scope="col">24h <i class="fa-solid fa-percent"></i></th>
+      <th scope="col">7d <i class="fa-solid fa-percent"></i></th>
+      <th scope="col">30d <i class="fa-solid fa-percent"></i></th>
+      <th scope="col">Tweets today <i class="fa-brands fa-twitter"></i></th>
+      <th scope="col">Projected price</th>
+      <th scope="col">Solid prediction</th>
     </tr>
   </thead>
   <tbody>
@@ -15,16 +18,19 @@
       <td class='align-middle'><img class='icon' src="../../../assets/images/{{coin.symbol | lowercase}}.png" alt="icon"> {{ coin.coin }} <strong>{{ coin.symbol | uppercase }}</strong></td>
       <td class='align-middle'>{{ coin.quote.USD.price | number : '1.2-2' }} $</td>
       <td class='align-middle'>
-        <span *ngIf="coin.quote.USD.percent_change_24h < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_24h | number : '1.2-2' }}%</span>
-        <span *ngIf="coin.quote.USD.percent_change_24h >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_24h | number : '1.2-2' }}%</span>
+        <span *ngIf="coin.quote.USD.percent_change_24h < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_24h | number : '1.2-2' }} %</span>
+        <span *ngIf="coin.quote.USD.percent_change_24h >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_24h | number : '1.2-2' }} %</span>
       </td>
       <td class='align-middle'>
-        <span *ngIf="coin.quote.USD.percent_change_7d < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_7d | number : '1.2-2' }}%</span>
-        <span *ngIf="coin.quote.USD.percent_change_7d >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_7d | number : '1.2-2' }}%</span>
+        <span *ngIf="coin.quote.USD.percent_change_7d < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_7d | number : '1.2-2' }} %</span>
+        <span *ngIf="coin.quote.USD.percent_change_7d >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_7d | number : '1.2-2' }} %</span>
       </td>
       <td class='align-middle'>
-        <span *ngIf="coin.quote.USD.percent_change_30d < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_30d | number : '1.2-2' }}%</span>
-        <span *ngIf="coin.quote.USD.percent_change_30d >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_30d | number : '1.2-2' }}%</span>
+        <span *ngIf="coin.quote.USD.percent_change_30d < 0" class="badge bg-danger">{{ coin.quote.USD.percent_change_30d | number : '1.2-2' }} %</span>
+        <span *ngIf="coin.quote.USD.percent_change_30d >= 0" class="badge bg-success">{{ coin.quote.USD.percent_change_30d | number : '1.2-2' }} %</span>
+      </td>
+      <td class='align-middle'>
+        <span>{{ coin.tweets }}</span>
       </td>
     </tr>
   </tbody>

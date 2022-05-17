@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import json
 import numpy as np
-import datetime
 from os import listdir
 from os.path import isfile, join
 

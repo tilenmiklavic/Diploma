@@ -1,13 +1,17 @@
-import matplotlib.pyplot as plt
+import sys
 import json
-import numpy as np
-import datetime
 from os import listdir
 from os.path import isfile, join
 
-PATH = "tweets_data/json_files/"
-OUTPUT_PATH = "normalized_tweets/"
-ABOUT_PATH = "about/coin_data.json"
+PATH_TWEETS = "../tweets_data/json_files/"
+OUTPUT_PATH_TWEETS = "normalized_tweets/"
+ABOUT_PATH_TWEETS = "about/tweet_data.json"
+
+PATH_PRICES = "../price_data/json_files/"
+OUTPUT_PATH_PRICES = "normalized_prices/"
+ABOUT_PATH_PRICES = "about/price_data.json"
+
+columns_to_normalize = ["tweet", "price"]
 
 about_data = { "coins": [] }
 
@@ -23,10 +27,9 @@ def listFiles(dir):
 
 
 # function for plotting a graph from JSON data
-def normalize(file1):
-    with open(PATH + file1) as json_file:
+def normalize(file1, input_path, output_path):
+    with open(input_path + file1) as json_file:
         data = json.load(json_file)
-        new_data = []
         key = ''
         sub_key = ''
         max_value = float('-inf')
@@ -47,10 +50,17 @@ def normalize(file1):
 
                 # we have to get the key over which we normalize in the first loop iteration
                 if not sub_key:
-                    print('Normalize which column: ')
+                    
                     for kljuc in p.keys():
-                        print(kljuc)
-                    sub_key = input('Answear: ')
+                        if kljuc in columns_to_normalize:
+                            sub_key = kljuc
+                            break
+                    
+                    if not sub_key:
+                        print('Normalize which column: ')
+                        for kljuc in p.keys():
+                            print(kljuc)
+                        sub_key = input('Answear: ')
 
                 # if we encounter a missing value we fill it with the last known one
                 print(p[sub_key])
@@ -110,7 +120,7 @@ def normalize(file1):
             except ValueError:
                 print("Not int")
 
-        with open(OUTPUT_PATH + file1, 'w') as outfile:
+        with open(output_path + file1, 'w') as outfile:
             json.dump(normalized_data, outfile)
 
         avg_value = sum_values / len(normalized_list)
@@ -121,10 +131,25 @@ def normalize(file1):
 
 
 if __name__ == '__main__':
-    tweetsFiles = listFiles(PATH)
+    
+    # tweets
+    tweetsFiles = listFiles(PATH_TWEETS)
+    
+    print(tweetsFiles)
 
     for file in tweetsFiles:
-        normalize(file)
+        normalize(file, PATH_TWEETS, OUTPUT_PATH_TWEETS)
 
-    with open(ABOUT_PATH, 'w') as outfile:
+    with open(ABOUT_PATH_TWEETS, 'w') as outfile:
+        json.dump(about_data, outfile)
+        
+    # prices 
+    pricesFiles = listFiles(PATH_PRICES)
+    
+    print(pricesFiles)
+
+    for file in pricesFiles:
+        normalize(file, PATH_PRICES, OUTPUT_PATH_PRICES)
+
+    with open(ABOUT_PATH_PRICES, 'w') as outfile:
         json.dump(about_data, outfile)
