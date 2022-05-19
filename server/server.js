@@ -6,13 +6,15 @@ const app = express();
 const PythonShell = require('python-shell').PythonShell;
 const port = process.env.PORT || 3000
 const axios = require('axios');
-const moment = require('moment')
+const moment = require('moment');
+const { response } = require('express');
 
 app.use(cors())
 
 // ============ ROUTES ======================
 app.get('/', index)
-app.get('/get', getCoinsData)
+app.get('/get', get)
+app.get('/getCoins', getCoinsData)
 app.get('/getTweets', getTweetsData)
 app.get('/scrape', scrape)
 app.get('/append', append)
@@ -28,7 +30,18 @@ function index(req, res) {
 // reading results.json
 function readTweetsData() {
     return new Promise((resolve, reject) => {
-        fs.readFile('../scraper/results.json', (err, data) => {
+        fs.readFile('results.json', (err, data) => {
+            if (err) throw err;
+            let student = JSON.parse(data);
+            resolve(student)
+        }); 
+    });
+}
+
+// reading correlation.json
+function readCorrelationData() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('../correlation/correlation_data/correlation.json', (err, data) => {
             if (err) throw err;
             let student = JSON.parse(data);
             resolve(student)
@@ -132,41 +145,84 @@ function normalize(req, res) {
 
 // get all info about coins 
 // that includes prices and tweets
-function getCoinsData(req, res) {
-    readTweetsData()
-        .then((result, reject) => {
-            readCoinsPrice(result.tweets.map(x => x.symbol))
-                .then(coinsPrices => {
-                    res.send(coinsPrices.data)
-                })
-        })
-        .catch((error) => {
-            console.error(error)
-            res.send(false)
-        })
-        .finally(() => {
-            append();
-        })
+function getCoinsData() {
+    return new Promise((resolve, reject) => {
+        readTweetsData()
+            .then((result, reject) => {
+                readCoinsPrice(result.tweets.map(x => x.symbol))
+                    .then(coinsPrices => {
+                        resolve(coinsPrices.data)
+                    })
+            })
+            .catch((error) => {
+                console.error(error)
+                resolve(false)
+            })
+            .finally(() => {
+                append();
+            })
+    })
 }
 
-function getTweetsData(req, res) {
-    readTweetsData()
-        .then(odgovor => {
+function getTweetsData() {
+    return new Promise((resolve, reject) => {
+        readTweetsData()
+            .then(odgovor => {
+                if (odgovor.date === todayDate()) {
+                    resolve(odgovor)
+                } else {
+                    scrape()
+                        .then(odgovor => {
+                            readTweetsData()
+                                .then(data => {
+                                    resolve(data)
+                                })
+                        })
+                }
+            })
+    })
+}
 
-            console.log(odgovor)
-            console.log(todayDate())
+function get(req, res) {
 
-            if (odgovor.date === todayDate()) {
-                res.send(odgovor)
-            } else {
-                scrape()
-                    .then(odgovor => {
-                        readTweetsData()
-                            .then(data => {
-                                res.send(data)
+    let coinsData, tweetsData, correlationData
+    let responseData = {"coins": []}
+
+    getCoinsData()
+        .then(resultCoinsData => {
+            coinsData = resultCoinsData
+            getTweetsData()
+                .then(resultTweetsData => {
+                    tweetsData = resultTweetsData
+                    readCorrelationData()
+                        .then(resultCorrelationData => {
+                            correlationData = resultCorrelationData
+                        })
+                        .finally(() => {
+
+                            // load tweets data into response 
+                            responseData.coins = tweetsData.tweets
+
+                            // load coin price data into response 
+                            responseData.coins.forEach(el => {
+                                el.price  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.price
+                                el.percent_change_24h  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_24h
+                                el.percent_change_7d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_7d
+                                el.percent_change_30d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_30d
                             })
-                    })
-            }
+
+                            // load correlation data into response
+                            responseData.coins.forEach(coin => {
+                                correlationData.similarity.forEach(correlation => {
+                                    if (coin.symbol.toLowerCase() === correlation.symbol.toLowerCase()) {
+                                        coin.correlation = correlation.correlation
+                                    }
+                                })
+                            })
+
+                            res.send(responseData)
+                        })
+                })
         })
 }
 
@@ -187,7 +243,7 @@ function append() {
 
 // ============ END HTTP ENDPOINTS ============ // 
 
-// ============ UTILITIED ============ // 
+// ============ UTILITIEs ============ // 
 
 function todayDate() {
     let date = new Date();

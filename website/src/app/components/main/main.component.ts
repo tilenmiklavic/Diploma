@@ -19,27 +19,10 @@ export class MainComponent implements OnInit {
   private populateTable(): void {
     this.coinService.get()
       .then(odgovor => {
-        for (const [key, value] of Object.entries(odgovor.data)) {
-          this.coins.push(value[0])
-        }
-        console.log("This coins", this.coins)
+        this.coins = odgovor.coins
       })
       .catch(napaka => {
         console.error("Napaka:", napaka)
-      })
-      .finally(() => {
-        this.coinService.getTweets()
-        .then(odgovor => {
-          console.log(odgovor.tweets)
-
-          odgovor.tweets.forEach(tweet => {
-            this.coins.forEach(coin => {
-              if (coin.symbol.toLowerCase() === tweet.symbol.toLowerCase()) {
-                coin.tweets = tweet.tweet
-              }
-            })
-          });
-        })
       })
   }
 

@@ -27,6 +27,7 @@ def listFiles(file1):
 
 def writeResults(data, file1):
     print(data)
+    print(OUTPUT_PATH + file1)
     with open(OUTPUT_PATH + file1, 'w') as outfile:
         json.dump(data, outfile)
 
