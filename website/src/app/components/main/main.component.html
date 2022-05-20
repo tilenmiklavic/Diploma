@@ -8,6 +8,7 @@
       <th scope="col">7d <i class="fa-solid fa-percent"></i></th>
       <th scope="col">30d <i class="fa-solid fa-percent"></i></th>
       <th scope="col">Tweets today <i class="fa-brands fa-twitter"></i></th>
+      <th scope="col">Projected price</th>
       <th scope="col">Projected price change</th>
       <th scope="col">Solid prediction</th>
     </tr>
@@ -33,7 +34,11 @@
         <span>{{ coin.tweet }}</span>
       </td>
       <td class='align-middle'>
-        <span>N/A</span>
+        <span>{{ coin.prediction | number : '1.2-2' }} $</span>
+      </td>
+      <td class='align-middle'>
+        <span *ngIf="(coin.prediction - coin.price) <= 0" class="badge bg-danger">{{ (coin.prediction - coin.price) / coin.price | percent }}</span>
+        <span *ngIf="(coin.prediction - coin.price) > 0" class="badge bg-success">{{ (coin.prediction - coin.price) / coin.price | percent }}</span>
       </td>
       <td class='align-middle'>
         <span>{{ coin.correlation | percent }}</span>

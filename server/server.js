@@ -19,6 +19,8 @@ app.get('/getTweets', getTweetsData)
 app.get('/scrape', scrape)
 app.get('/append', append)
 app.get('/normalize', normalize)
+app.get('/predict', getPredictions)
+
 // ==========================================
 
 function index(req, res) {
@@ -42,6 +44,17 @@ function readTweetsData() {
 function readCorrelationData() {
     return new Promise((resolve, reject) => {
         fs.readFile('../correlation/correlation_data/correlation.json', (err, data) => {
+            if (err) throw err;
+            let student = JSON.parse(data);
+            resolve(student)
+        }); 
+    });
+}
+
+// reading predictions.json
+function readPredictionData() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('predicted_prices/predictions.json', (err, data) => {
             if (err) throw err;
             let student = JSON.parse(data);
             resolve(student)
@@ -127,6 +140,16 @@ function scrape() {
     })
 }
 
+// make new predictions
+function predict() {
+    return new Promise((resolve, reject) => {    
+        PythonShell.run('../prediction/predictor.py', null, function (err, results) {
+            if (err) reject();   
+            resolve(true)
+        });
+    })
+}
+
 // normalizes data from prices and tweets
 function normalize(req, res) {
     return new Promise((resolve, reject) => {
@@ -183,9 +206,28 @@ function getTweetsData() {
     })
 }
 
+function getPredictions() {
+    return new Promise((resolve, reject) => {
+        readPredictionData()
+            .then(odgovor => {
+                if (odgovor.date && odgovor.date === todayDate()) {
+                    resolve(odgovor)
+                } else {
+                    predict()
+                        .then(odgovor => {
+                            readPredictionData()
+                                .then(data => {
+                                    resolve(data)
+                                })
+                        })
+                }
+            })
+    })
+}
+
 function get(req, res) {
 
-    let coinsData, tweetsData, correlationData
+    let coinsData, tweetsData, correlationData, predictionData
     let responseData = {"coins": []}
 
     getCoinsData()
@@ -197,31 +239,44 @@ function get(req, res) {
                     readCorrelationData()
                         .then(resultCorrelationData => {
                             correlationData = resultCorrelationData
-                        })
-                        .finally(() => {
-
-                            // load tweets data into response 
-                            responseData.coins = tweetsData.tweets
-
-                            // load coin price data into response 
-                            responseData.coins.forEach(el => {
-                                el.price  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.price
-                                el.percent_change_24h  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_24h
-                                el.percent_change_7d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_7d
-                                el.percent_change_30d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_30d
-                            })
-
-                            // load correlation data into response
-                            responseData.coins.forEach(coin => {
-                                correlationData.similarity.forEach(correlation => {
-                                    if (coin.symbol.toLowerCase() === correlation.symbol.toLowerCase()) {
-                                        coin.correlation = correlation.correlation
-                                    }
+                            getPredictions()
+                                .then(predictions => {
+                                    predictionData = predictions
                                 })
-                            })
+                                .finally(() => {
 
-                            res.send(responseData)
-                        })
+                                    // load tweets data into response 
+                                    responseData.coins = tweetsData.tweets
+
+                                    // load coin price data into response 
+                                    responseData.coins.forEach(el => {
+                                        el.price  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.price
+                                        el.percent_change_24h  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_24h
+                                        el.percent_change_7d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_7d
+                                        el.percent_change_30d  = coinsData.data[el.symbol.toUpperCase()][0].quote.USD.percent_change_30d
+                                    })
+
+                                    // load correlation data into response
+                                    responseData.coins.forEach(coin => {
+                                        correlationData.similarity.forEach(correlation => {
+                                            if (coin.symbol.toLowerCase() === correlation.symbol.toLowerCase()) {
+                                                coin.correlation = correlation.correlation
+                                            }
+                                        })
+                                    })
+
+                                    // load prediction data into response
+                                    responseData.coins.forEach(coin => {
+                                        predictionData.predictions.forEach(prediction => {
+                                            if (coin.symbol.toLowerCase() === prediction.symbol.toLowerCase()) {
+                                                coin.prediction = prediction.prediction
+                                            }
+                                        })
+                                    })
+
+                                    res.send(responseData)
+                                })
+                    })
                 })
         })
 }
