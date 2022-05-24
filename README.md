@@ -1,24 +1,21 @@
 # Diploma
-## ANALIZA IN PREDVIDEVANJE VPLIVA OMEMB KRIPTOVALUT NA NJIHOVO CENO 
 
-Repozitorij hrani podatke za analizo v sklopu diplomske naloge, izvorno kodo za analizo podatkov, ter izvorno kodo za spletnega agenta za obveščanje. 
+## Lokalna uspostavitev okolja
 
-Glavni deli diplomske naloge: 
-- pridobivanje zgodovinskih podatkov s socialnega omrežja Twitter, kjer so se omenjale posamezne kriptovalute, časovna razporeditev teh “twittov” 
-- iskanje korelacije med količino twittov in rastjo/padanjem cene posamezne kriptovalute
-- izgradnja sistema za napovedovanje trenutnih/prihodnjih rasti kriptovalut glede na dogajanje na Twitterju “v živo”
+Celoten sistem lahko poženemo tudi lokalno, tako da sledimo spodnjim navodilom: 
 
-### DEL 1
-Opredelitev nabora opazovanih kriptovalut. Pridobivanje zgodovinskih podatkov, ki prikazujejo, kolikšna količina čivkov je v določenem časovnem okvirju omenjala izbrano kriptovaluto. Ta del bo izveden s pomočjo Twitter API-ja, oziroma drugih spletnih orodij zaradi določenih omejitev. 
-Za podatke o trenutni popularnosti bi analiziral tudi objave s socialnega omrežja Reddit. 
+- repozitorij prenesemo na svoj računalnik z ukazom `git clone https://github.com/tilenmiklavic/Diploma`
 
-### DEL 2
-V drugem delu bi vizualiziral količino čivkov o posamezni kriptovaluti ter ceno te iste kriptovalute na isti časovni osi, ter poiskal korelacije med količinama. Predpostavka bi lahko bila: “Zaradi povečane količine čivkov o kriptovaluti ETH, je cena le te začela nihati bolj kot pa v obdobju zadnjega meseca”.  
+V mapi website se nahaja izvorna koda za spletni vmesnik, preko katerega lahko spremljamo aktualne cene in napovedi.
+- Premaknemo se v delovno mapo projekta z ukazom `cd website/src/app/`.
+- Ukaz `npm install` bo poskrbel, da se prenesejo vsi paketi, ki so nujni za delovanje aplikacije. 
+- Da bo spetna stran tudi delovala, jo poženemo z ukazom `ng serve --host 0.0.0.0`
+- Spletna stran bo po uspešnem zagonu dostopna na `htpp://localhost:4200`
 
-### DEL 3
-Iz ugotovitev 2. dela bi izdelal model, ki bi lahko v živo predvidel ponavljanje zgodovinskega dogajanja na trgu in o tem obvestil uporabnika. Ravno tako bi spremljal novice in čivke “vplivnežev”, kar bi posebej klasificiral kot izreden dogodek. 
-Model bi nato preizkusil na trenutnem obnašanju trga in simuliral njegovo obnašanja in uspešnost napovedovanja. 
+Sedaj je potrebno zagnati še zaledni del aplikacije.
 
-## REFERENCE
-- [**tweets_data**](tweets_data) Vsebuje datoteke s številom čivkov skozi čas. 
-- [**json_files**](tweets_data/json_files) Vsebuje podatke iy **tweets_data** v JSON obliki za lažje procesiranje.
+- premaknemo se v korensko mapo projekta. 
+- z ukazom `pip install -r requirements.txt` namestimo vse potrebne pakete za delovanje Python zalednega dela aplikacije
+- premaknemo se v mapo `server`
+- z ukazom `npm install` namestimo vse potrebne pakete za izvajanje Node zaledne aplikacije
+- z ukazom `npm run prod` zaženemo zaledni del, ki je sedaj dostopen na naslovu `http://localhost:3000`
